@@ -128,6 +128,7 @@ To automatically tune the PID parameters, we can apply the Twiddle method. We sh
 Avoiding the use of a model is helpful since:
 - it can be applied easily to any kind of dynamic system;
 - avoid the creation of an accurate model of the car that can be hard and time-consuming.
+
 On the other hand, a model free controller:
 - requires some time for tuning the parameters to address a specific application (like steering or throttle)
 - it will hardly converge to 0 error for a dynamic control.
