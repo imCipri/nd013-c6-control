@@ -106,23 +106,26 @@ Answer the following questions:
 
 ### - Add the plots to your report and explain them (describe what you see)
 
-The following plot shows the performance of the PID for steering.
+1. The following plot shows the performance of the PID for steering up until the moment in which the car stops at the end of the road.
 
 <img src="project/steering_pid.png"/>
 
-We can see how the PID is trying to compensate the error by emulating it but with opposite sign. In this way, it tries to take it to 0. We can observe also that the steering output is generally lower than the error. This should be corrected by increasing the PID gains. However, increasing the coefficients can bring instability in the control of the car. 
+We can see how the PID is trying to compensate the error by emulating it but with opposite sign. In this way, it tries to take it to 0. We can observe also that the steering output is generally lower than the error. This should be corrected by increasing the PID gains. However, increasing the coefficients can bring instability in the control of the car. A trade-off is necessary. 
+Moreover, we can observe that the error is oscillating around 0. Thus, it can be inferred that it is not subject to a sistematic bias. We can set Ki = 0.0.
 
-The following plot shows the performance of the PID for the throttle.
+2. The following plot shows the performance of the PID for the throttle.
 
 <img src="project/throttle_pid.png"/>
 
-Here, we can state that the velocity input is fragmented. This brings instability in the use of the PID that it's not able to copy the error. This is why the derivative gain is lower in this PID than the one for steering. An higher frequency should help with this problem. Also, we can observe the presence of a sistematic bias, that it's slowly corrected by the integrative gain of the PID. 
+Here, we can observe that the velocity input is fragmented. This is the reason why the derivative gain is lower in this PID than the one for steering. An higher frequency should help solving this problem. Otherwise, we can apply a filter to the velocity to reduce the variation of the PID input and obtain a smoother result.
+In addition, we can observe the presence of a sistematic bias, that it's slowly corrected by the integrative gain (Ki) of the PID. 
 
 ### - What is the effect of the PID according to the plots, how each part of the PID affects the control command?
-The PID controls the steering and the throttle by imposing a command as close as possible to the absolute value of the error, but with the opposite sign. The P part of the PID give a command proportional to the magnitude of the error, the D adds a command based on how quickly the error is changing, whereas the I compensate for sistematic biases (like the one in the throttle PID shown above).
+The PID controls the steering and the throttle by imposing a command as close as possible to the absolute value of the error, but with the opposite sign. The P part of the PID give a command proportional to the magnitude of the error, the D adds a command based on how quickly the error is changing, whereas the I-term compensate for sistematic biases (present only in the throttle PID shown above).
 
 ### - How would you design a way to automatically tune the PID parameters?
-To automatically tune the PID parameters, we can apply the Twiddle method. We should write a script that runs sistematically the simulation and collects the results. The script will modify one gain per iteration. Due to the presence of 6 values to tweak, the number of possible results is pretty high. Therefore, we have to assign a good starting point. We can help the script by considering various parameters. For example, if we apply only a P gain and the mean of the error is close to 0, it could mean that there is no sistematic bias, and so the I gain can be set to 0 now on.
+To automatically tune the PID parameters, we can apply the Twiddle method. We should write a script that runs sistematically the simulation and collects the results. The script will modify one gain per iteration. Due to the presence of 6 values to tweak, the number of possible results is pretty high. Therefore, we have to assign a good starting point. 
+We can help the script by considering various parameters. For example, if we apply only a P gain and the mean of the error is close to 0, it could mean that there is no sistematic bias, and so the integrative gain can be set to 0.
 
 ### - PID controller is a model free controller, i.e. it does not use a model of the car. Could you explain the pros and cons of this type of controller?
 Avoiding the use of a model is helpful since:
@@ -131,7 +134,8 @@ Avoiding the use of a model is helpful since:
 
 On the other hand, a model free controller:
 - requires some time for tuning the parameters to address a specific application (like steering or throttle)
-- it will hardly converge to 0 error for a dynamic control.
+- it will hardly converge to 0 error for a dynamic control
+- it can behave wrongly (unstable) if an unpredicted scenario is presented.
  
 ### - (Optional) What would you do to improve the PID controller?
 The PID controller can be improved by increasing its control frequency or by filtering the data from the sensors. The second will prevent that outliers in the measurement phase cause an improvvise peak in the response.
