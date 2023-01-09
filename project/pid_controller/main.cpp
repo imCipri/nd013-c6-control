@@ -226,8 +226,8 @@ int main ()
   PID pid_steer = PID();
   PID pid_throttle = PID();
   // Initialize kp,ki, kd and the output limits for pid_throttle and pid_steer
-  pid_throttle.Init(0.18,0.001,0.18,1,-1);
-  pid_steer.Init(0.34,0.0,0.71,1.2,-1.2);
+  pid_throttle.Init(0.18,0.001,0.1,1,-1);
+  pid_steer.Init(0.39,0.00,0.62,1.2,-1.2);
 
   h.onMessage([&pid_steer, &pid_throttle, &new_delta_time, &timer, &prev_timer, &i, &prev_timer](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode)
   { 
@@ -247,6 +247,11 @@ int main ()
           vector<double> x_points = data["traj_x"];
           vector<double> y_points = data["traj_y"];
           vector<double> v_points = data["traj_v"];
+          
+          // Define a lookahead variable to select the point on which plan the desired velocity and 
+          // steering for the two PIDs.
+          int lookahead_n_wp = x_points.size()-1;
+
           double yaw = data["yaw"];
           double velocity = data["velocity"];
           double sim_time = data["time"];
@@ -301,21 +306,20 @@ int main ()
           * TODO (step 3): compute the steer error (error_steer) from the position and the desired trajectory
           **/
           /*
-            The error is calculated as the angle difference between the actual yaw and the desired one.
+            The error is calculated as the angle difference between the desired yaw and the actual one.
             The desired yaw is calculated from the trajectory vectors and the actual position. A lookahead_n_wp integer 
             is implemented so that the yaw can be calculated for a desired position slightly away from the actual position. In this way,
             we can account for a delay in the execution of the comand, teoretically reducing the noise and jerk.
             The desired yaw is calculated by the difference between the selected waypoint and the actual position using
             the angle_between_points function.
           */
-          int lookahead_n_wp = 0;
           double des_steer = angle_between_points(x_position, y_position, x_points[lookahead_n_wp],y_points[lookahead_n_wp]);
           // We check that the desired yaw is bounded
           des_steer = (des_steer > pid_steer.output_lim_max) ? pid_steer.output_lim_max : des_steer;
           des_steer = (des_steer < pid_steer.output_lim_min) ? pid_steer.output_lim_min : des_steer;
 
           // Error calculation
-          error_steer = yaw - des_steer; 
+          error_steer = des_steer - yaw; 
       
           /**
           * TODO (step 3): uncomment these lines
@@ -355,10 +359,10 @@ int main ()
             I hypotise that v_points[0] is the velocity in the point right next to the actual position. Therefore, by using
             the lookahead factor, I calculate the error using a slightly far away point to account for delays in the execution
             of the comand.
-            The error is equal to the difference between the actual and the desired velocity.
+            The error is equal to the difference between the desired and the actual velocity.
           */
-          error_throttle = velocity - v_points[lookahead_n_wp + 1];
-
+          error_throttle = v_points[lookahead_n_wp] -velocity;
+          
           double throttle_output;
           double brake_output;
 
@@ -368,6 +372,7 @@ int main ()
           // Compute control to apply
           pid_throttle.UpdateError(error_throttle);
           double throttle = pid_throttle.TotalError();
+
 
           // Adapt the negative throttle to break
           if (throttle > 0.0) {
