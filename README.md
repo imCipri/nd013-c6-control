@@ -110,7 +110,7 @@ Answer the following questions:
 
 <img src="project/steering_pid.png"/>
 
-We can see how the PID is trying to compensate the error by emulating it but with opposite sign. In this way, it tries to take it to 0. We can observe also that the steering output is generally lower than the error. This should be corrected by increasing the PID gains. However, increasing the coefficients can bring instability in the control of the car. A trade-off is necessary. 
+We can see how the PID is trying to compensate the error by emulating it. In this way, it tries to take it to 0. We can observe also that the steering output is generally lower than the error. This should be corrected by increasing the PID gains. However, increasing the coefficients can bring instability in the control of the car. A trade-off is necessary. 
 Moreover, we can observe that the error is oscillating around 0. Thus, it can be inferred that it is not subject to a sistematic bias. We can set Ki = 0.0.
 
 2. The following plot shows the performance of the PID for the throttle.
@@ -121,7 +121,7 @@ Here, we can observe that the velocity input is fragmented. This is the reason w
 In addition, we can observe the presence of a sistematic bias, that it's slowly corrected by the integrative gain (Ki) of the PID. 
 
 ### - What is the effect of the PID according to the plots, how each part of the PID affects the control command?
-The PID controls the steering and the throttle by imposing a command as close as possible to the absolute value of the error, but with the opposite sign. The P part of the PID give a command proportional to the magnitude of the error, the D adds a command based on how quickly the error is changing, whereas the I-term compensate for sistematic biases (present only in the throttle PID shown above).
+The PID controls the steering and the throttle by imposing a command as close as possible to the absolute value of the error. The P part of the PID give a command proportional to the magnitude of the error, the D adds a command based on how quickly the error is changing, whereas the I-term compensate for sistematic biases (present only in the throttle PID shown above).
 
 ### - How would you design a way to automatically tune the PID parameters?
 To automatically tune the PID parameters, we can apply the Twiddle method. We should write a script that runs sistematically the simulation and collects the results. The script will modify one gain per iteration. Due to the presence of 6 values to tweak, the number of possible results is pretty high. Therefore, we have to assign a good starting point. 
