@@ -108,14 +108,14 @@ Answer the following questions:
 
 1. The following plot shows the performance of the PID for steering up until the moment in which the car stops at the end of the road.
 
-<img src="project/steering_pid.png"/>
+<img src="project/steering_pid_updated.png"/>
 
 We can see how the PID is trying to compensate the error by emulating it. In this way, it tries to take it to 0. We can observe also that the steering output is generally lower than the error. This should be corrected by increasing the PID gains. However, increasing the coefficients can bring instability in the control of the car. A trade-off is necessary. 
 Moreover, we can observe that the error is oscillating around 0. Thus, it can be inferred that it is not subject to a sistematic bias. We can set Ki = 0.0.
 
 2. The following plot shows the performance of the PID for the throttle.
 
-<img src="project/throttle_pid.png"/>
+<img src="project/throttle_pid_updated.png"/>
 
 Here, we can observe that the velocity input is fragmented. This is the reason why the derivative gain is lower in this PID than the one for steering. An higher frequency should help solving this problem. Otherwise, we can apply a filter to the velocity to reduce the variation of the PID input and obtain a smoother result.
 In addition, we can observe the presence of a sistematic bias, that it's slowly corrected by the integrative gain (Ki) of the PID. 
